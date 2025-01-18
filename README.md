@@ -37,3 +37,4 @@ The easiest way to deploy this application is to use the [Vercel Platform](https
 2. Import your project to Vercel
 3. Add your OpenAI API key to the environment variables in your Vercel project settings
 4. Deploy!
+# UandMe
