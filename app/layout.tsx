@@ -1,13 +1,11 @@
-import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { DarkModeProvider } from './dark-mode-provider'
+import { metadata } from './metadata'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'Voice to AI Assistant',
-  description: 'Record your voice, convert to text, and get AI responses',
-}
+export { metadata }
 
 export default function RootLayout({
   children,
@@ -16,7 +14,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <DarkModeProvider>
+          {children}
+        </DarkModeProvider>
+      </body>
     </html>
   )
 }

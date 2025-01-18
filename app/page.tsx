@@ -1,180 +1,257 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useReactMediaRecorder } from 'react-media-recorder';
-import { Analytics } from '@vercel/analytics/react';
+import { useState, useEffect, useRef } from 'react';
+import OpenAI from 'openai';
 
-const RecorderComponent = () => {
-  const [personAText, setPersonAText] = useState('');
-  const [personBText, setPersonBText] = useState('');
-  const [currentPerson, setCurrentPerson] = useState<'A' | 'B' | null>(null);
-  const [processing, setProcessing] = useState(false);
-  const [response, setResponse] = useState('');
+let openai: OpenAI | null = null;
 
-  const { status, startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({ 
-    audio: true,
-    onStop: async (blobUrl) => {
-      if (blobUrl) {
-        setProcessing(true);
-        try {
-          const audioBlob = await fetch(blobUrl).then((r) => r.blob());
-          const reader = new FileReader();
-          reader.readAsDataURL(audioBlob);
-          reader.onloadend = async () => {
-            const base64Audio = reader.result;
-            
-            const response = await fetch('/api/process', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ 
-                audio: base64Audio, 
-                generateResponse: false,
-                person: currentPerson  
-              }),
-            });
+export default function Home() {
+  const [firstPersonText, setFirstPersonText] = useState('');
+  const [secondPersonText, setSecondPersonText] = useState('');
+  const [chatGPTResponse, setChatGPTResponse] = useState('');
+  const [isRecordingFirst, setIsRecordingFirst] = useState(false);
+  const [isRecordingSecond, setIsRecordingSecond] = useState(false);
+  const [error, setError] = useState<string>('');
 
-            const data = await response.json();
-            if (currentPerson === 'A') {
-              setPersonAText(data.text);
-            } else {
-              setPersonBText(data.text);
-            }
-            setCurrentPerson(null);
-          };
-        } catch (error) {
-          console.error('Error processing audio:', error);
-        } finally {
-          setProcessing(false);
-        }
-      }
+  // Refs to store MediaRecorder instances
+  const firstRecorderRef = useRef<MediaRecorder | null>(null);
+  const secondRecorderRef = useRef<MediaRecorder | null>(null);
+  const firstStreamRef = useRef<MediaStream | null>(null);
+  const secondStreamRef = useRef<MediaStream | null>(null);
+
+  useEffect(() => {
+    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    if (!apiKey) {
+      setError('OpenAI API key is missing. Please add it to your .env.local file.');
+      return;
     }
-  });
+    openai = new OpenAI({
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true
+    });
+  }, []);
 
-  const handleRecordClick = (person: 'A' | 'B') => {
-    if (status === 'recording') {
-      stopRecording();
-    } else {
-      setCurrentPerson(person);
-      startRecording();
+  const stopRecording = async (person: 'first' | 'second') => {
+    const recorder = person === 'first' ? firstRecorderRef.current : secondRecorderRef.current;
+    const stream = person === 'first' ? firstStreamRef.current : secondStreamRef.current;
+
+    if (recorder && recorder.state === 'recording') {
+      recorder.stop();
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      if (person === 'first') {
+        setIsRecordingFirst(false);
+        firstRecorderRef.current = null;
+        firstStreamRef.current = null;
+      } else {
+        setIsRecordingSecond(false);
+        secondRecorderRef.current = null;
+        secondStreamRef.current = null;
+      }
     }
   };
 
+  const toggleRecording = async (person: 'first' | 'second') => {
+    if (!openai) {
+      setError('OpenAI client is not initialized. Please check your API key.');
+      return;
+    }
+
+    // If already recording, stop it
+    if ((person === 'first' && isRecordingFirst) || (person === 'second' && isRecordingSecond)) {
+      await stopRecording(person);
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      const audioChunks: Blob[] = [];
+
+      // Store the recorder and stream in refs
+      if (person === 'first') {
+        firstRecorderRef.current = mediaRecorder;
+        firstStreamRef.current = stream;
+      } else {
+        secondRecorderRef.current = mediaRecorder;
+        secondStreamRef.current = stream;
+      }
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        try {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+          const audioFile = new File([audioBlob], 'audio.mp3', {
+            type: 'audio/mp3',
+            lastModified: Date.now(),
+          });
+
+          const response = await openai!.audio.transcriptions.create({
+            file: audioFile,
+            model: 'whisper-1',
+            language: 'en',
+          });
+
+          if (person === 'first') {
+            setFirstPersonText(prev => prev + (prev ? '\n' : '') + response.text);
+          } else {
+            setSecondPersonText(prev => prev + (prev ? '\n' : '') + response.text);
+          }
+          setError('');
+        } catch (error: any) {
+          console.error('Error transcribing audio:', error);
+          setError(`Error transcribing audio: ${error.message || 'Unknown error occurred'}`);
+        }
+      };
+
+      // Start recording
+      mediaRecorder.start();
+      if (person === 'first') {
+        setIsRecordingFirst(true);
+      } else {
+        setIsRecordingSecond(true);
+      }
+
+      // Request data every 5 seconds to avoid large chunks
+      mediaRecorder.addEventListener('start', () => {
+        const interval = setInterval(() => {
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.requestData();
+          } else {
+            clearInterval(interval);
+          }
+        }, 5000);
+      });
+
+    } catch (error: any) {
+      console.error('Error accessing microphone:', error);
+      setError(`Error accessing microphone: ${error.message || 'Please make sure you have granted microphone permissions.'}`);
+    }
+  };
+
+  const sendToChatGPT = async () => {
+    if (!openai) {
+      setError('OpenAI client is not initialized. Please check your API key.');
+      return;
+    }
+
+    try {
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant analyzing a conversation between two people.'
+          },
+          {
+            role: 'user',
+            content: `First person: ${firstPersonText}\nSecond person: ${secondPersonText}`
+          }
+        ],
+      });
+
+      setChatGPTResponse(response.choices[0].message.content || '');
+      setError('');
+    } catch (error: any) {
+      console.error('Error sending to ChatGPT:', error);
+      setError(`Error getting response from ChatGPT: ${error.message || 'Please check your API key and try again.'}`);
+    }
+  };
+
+  // Cleanup function
+  useEffect(() => {
+    return () => {
+      if (firstStreamRef.current) {
+        firstStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+      if (secondStreamRef.current) {
+        secondStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-8">
-      <h1 className="text-4xl font-bold text-center">Voice to AI Assistant</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Person A Section */}
-        <div className={`p-4 rounded-lg border-2 ${
-          currentPerson === 'A' && status === 'recording'
-            ? 'border-red-500'
-            : personAText 
-              ? 'bg-gray-100 border-gray-300' 
-              : 'bg-gray-50 border-dashed border-gray-200'
-        }`}>
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="font-semibold text-gray-700">
-              Person A {currentPerson === 'A' && status === 'recording' && '(Recording...)'}
-            </h2>
-            <button
-              onClick={() => handleRecordClick('A')}
-              disabled={processing || (status === 'recording' && currentPerson !== 'A')}
-              className={`px-3 py-1 rounded ${
-                currentPerson === 'A' && status === 'recording'
-                  ? 'bg-red-500 hover:bg-red-600'
-                  : 'bg-blue-500 hover:bg-blue-600'
-              } text-white text-sm disabled:opacity-50`}
-            >
-              {currentPerson === 'A' && status === 'recording' ? 'Stop' : 'Record'}
-            </button>
-          </div>
-          <p className="min-h-[100px] whitespace-pre-wrap">
-            {personAText || 'Waiting for recording...'}
-          </p>
+    <main className="min-h-screen p-8 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8 text-center dark:text-white">U&Me - AI Mediator</h1>
+      <p className="text-lg text-center text-gray-700 dark:text-gray-300">
+        A tool for two people to communicate and come to a mutual understanding.
+        Record a conversation and get a generated response based on the conversation.
+      </p>
+      <br></br>
+
+      {error && (
+        <div className="mb-8 p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold dark:text-white">First Person</h2>
+          <button
+            onClick={() => toggleRecording('first')}
+            className={`w-full p-3 rounded-lg ${
+              isRecordingFirst 
+                ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700' 
+                : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+            } text-white transition-colors`}
+            disabled={isRecordingSecond}
+          >
+            {isRecordingFirst ? 'Stop Recording' : 'Start Recording'}
+          </button>
+          <textarea
+            value={firstPersonText}
+            onChange={(e) => setFirstPersonText(e.target.value)}
+            className="w-full h-40 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+            placeholder="First person's text will appear here..."
+          />
         </div>
 
-        {/* Person B Section */}
-        <div className={`p-4 rounded-lg border-2 ${
-          currentPerson === 'B' && status === 'recording'
-            ? 'border-red-500'
-            : personBText 
-              ? 'bg-blue-50 border-blue-200' 
-              : 'bg-gray-50 border-dashed border-gray-200'
-        }`}>
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="font-semibold text-blue-700">
-              Person B {currentPerson === 'B' && status === 'recording' && '(Recording...)'}
-            </h2>
-            <button
-              onClick={() => handleRecordClick('B')}
-              disabled={processing || (status === 'recording' && currentPerson !== 'B')}
-              className={`px-3 py-1 rounded ${
-                currentPerson === 'B' && status === 'recording'
-                  ? 'bg-red-500 hover:bg-red-600'
-                  : 'bg-green-500 hover:bg-green-600'
-              } text-white text-sm disabled:opacity-50`}
-            >
-              {currentPerson === 'B' && status === 'recording' ? 'Stop' : 'Record'}
-            </button>
-          </div>
-          <p className="min-h-[100px] whitespace-pre-wrap">
-            {personBText || 'Waiting for recording...'}
-          </p>
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold dark:text-white">Second Person</h2>
+          <button
+            onClick={() => toggleRecording('second')}
+            className={`w-full p-3 rounded-lg ${
+              isRecordingSecond 
+                ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700' 
+                : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+            } text-white transition-colors`}
+            disabled={isRecordingFirst}
+          >
+            {isRecordingSecond ? 'Stop Recording' : 'Start Recording'}
+          </button>
+          <textarea
+            value={secondPersonText}
+            onChange={(e) => setSecondPersonText(e.target.value)}
+            className="w-full h-40 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+            placeholder="Second person's text will appear here..."
+          />
         </div>
       </div>
 
-      {(personAText || personBText) && (
-        <div className="text-center">
-          <button
-            onClick={async () => {
-              setProcessing(true);
-              try {
-                const response = await fetch('/api/process', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ 
-                    personAText, 
-                    personBText,
-                    generateResponse: true 
-                  }),
-                });
+      <div className="text-center mb-8">
+        <button
+          onClick={sendToChatGPT}
+          className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!firstPersonText || !secondPersonText}
+        >
+          Analyze Conversation
+        </button>
+      </div>
 
-                const data = await response.json();
-                setResponse(data.aiResponse);
-              } catch (error) {
-                console.error('Error generating response:', error);
-              } finally {
-                setProcessing(false);
-              }
-            }}
-            disabled={processing || !personAText || !personBText}
-            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 disabled:opacity-50"
-          >
-            Generate Response
-          </button>
-        </div>
-      )}
-
-      {response && (
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h2 className="font-semibold mb-2">AI Response:</h2>
-          <p className="whitespace-pre-wrap">{response}</p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-import ClientRoot from './client';
-
-export default function Home() {
-  return (
-    <main className="min-h-screen p-8">
-      <ClientRoot />
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold dark:text-white">ChatGPT Analysis</h2>
+        <textarea
+          value={chatGPTResponse}
+          readOnly
+          className="w-full h-48 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
+          placeholder="ChatGPT's analysis will appear here..."
+        />
+      </div>
     </main>
   );
 }

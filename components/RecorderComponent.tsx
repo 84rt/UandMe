@@ -3,9 +3,12 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
-// Import the media recorder hook dynamically to avoid SSR issues
-const useReactMediaRecorder = dynamic(
-  () => import('react-media-recorder').then(mod => mod.useReactMediaRecorder),
+// Import the media recorder component dynamically to avoid SSR issues
+const ReactMediaRecorder = dynamic(
+  () => import('react-media-recorder').then(mod => {
+    const { ReactMediaRecorder } = mod;
+    return ReactMediaRecorder;
+  }),
   { ssr: false }
 );
 
@@ -22,7 +25,7 @@ const RecorderComponent = () => {
     setIsClient(true);
     // Initialize the recorder after component mounts
     const initRecorder = async () => {
-      const { status, startRecording, stopRecording, mediaBlobUrl } = (useReactMediaRecorder as any)({ 
+      const { status, startRecording, stopRecording, mediaBlobUrl } = (ReactMediaRecorder as any)({ 
         audio: true,
         onStop: async (blobUrl: string) => {
           if (blobUrl && currentPerson) {
