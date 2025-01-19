@@ -18,7 +18,6 @@ export default function Home() {
   const [secondPersonName, setSecondPersonName] = useState('');
   const [scrollPosition, setScrollPosition] = useState(0);
   const [status, setStatus] = useState<'idle' | 'recording' | 'transcribing' | 'generating'>('idle');
-  const [darkMode, setDarkMode] = useState(false);
   const [gregMode, setGregMode] = useState(false);
   const [founderMode, setFounderMode] = useState(false);
 
@@ -56,19 +55,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     const savedGregMode = localStorage.getItem('gregM') === 'true';
     const savedFounderMode = localStorage.getItem('founderMode') === 'true';
-    setDarkMode(savedDarkMode);
     setGregMode(savedGregMode);
     setFounderMode(savedFounderMode);
   }, []);
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    localStorage.setItem('darkMode', String(newDarkMode));
-  };
 
   const toggleGregMode = () => {
     const newGregMode = !gregMode;
@@ -196,7 +187,7 @@ export default function Home() {
     try {
       setStatus('generating');
       const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -326,7 +317,9 @@ Present your summary in the following format:
           </span>
         </div>
         <main className="min-h-screen p-8 max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-center dark:text-white">U&Me - Your AI Mediator</h1>
+          <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-blue-400 to-purple-800 text-transparent bg-clip-text dark:text-transparent">
+            U&Me - Your AI Mediator
+          </h1>
           <h4 className="text-2xl font-semibold mb-4 dark:text-white">
             Use AI to mediate a conversation and come to a mutual understanding.
           </h4>
@@ -431,7 +424,7 @@ Present your summary in the following format:
           </div>
           <br></br>
           <p className="text-sm text-center text-gray-500 dark:text-gray-400">
-            Created by 84rt in 2025 under MIT License | Repo can be found here: <a href="https://github.com/84rt/UandMe" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">GitHub</a>
+            Created by <code>84rt</code> in 2025 under MIT License | Repo can be found here: <a href="https://github.com/84rt/UandMe" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">GitHub</a>
           </p>
         </main>
       </div>

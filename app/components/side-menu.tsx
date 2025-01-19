@@ -48,7 +48,10 @@ export function SideMenu({ darkMode, gregMode, founderMode, onDarkModeToggle, on
             <div className="flex items-center justify-between">
               <span className="text-gray-700 dark:text-gray-200">Dark Mode</span>
               <button
-                onClick={onDarkModeToggle}
+                onClick={() => {
+                  console.log('Dark mode toggle clicked. Current darkMode:', darkMode);
+                  onDarkModeToggle();
+                }}
                 className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 aria-label="Toggle dark mode"
               >
