@@ -212,7 +212,7 @@ Present your summary in the following format:
 
   <b> 4. Areas where both sides could work together to find a solution</b>
 
-MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDOWN`
+MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE. DO NOT USE MARKDOWN`
               : localStorage.getItem('gregMode') === 'true'
                 ? `You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}. 
 
@@ -368,7 +368,7 @@ MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDO
                 value={firstPersonText}
                 onChange={(e) => setFirstPersonText(e.target.value)}
                 className="w-full h-40 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                placeholder="First person's text will appear here..."
+                placeholder="Write the first person's argument here, or use the button above to start recording and the transcription will appear here..."
               />
             </div>
 
@@ -396,7 +396,7 @@ MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDO
                 value={secondPersonText}
                 onChange={(e) => setSecondPersonText(e.target.value)}
                 className="w-full h-40 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-                placeholder="Second person's text will appear here..."
+                placeholder="Write the second person's argument here, or use the button above to start recording and the transcription will appear here..."
               />
             </div>
           </div>
