@@ -312,12 +312,12 @@ Present your summary in the following format:
       <div className="relative z-10">
         {/* Status indicator moved to top left */}
         <div className="fixed top-4 left-4 z-50">
-          <span className="text-sm text-gray-500 dark:text-gray-400">Status: </span>
+          {/* <span className="text-sm text-gray-500 dark:text-gray-400">Status: </span> */}
           <span className={`inline-block px-3 py-1 rounded-full text-sm ${
-            status === 'idle' ? 'bg-gray-300 dark:bg-gray-500' :
+            status === 'idle' ? 'bg-gray-300 dark:bg-lightgray-400' :
             status === 'recording' ? 'bg-red-300 dark:bg-red-800 animate-pulse' :
-            status === 'transcribing' ? 'bg-yellow-300 dark:bg-yellow-800' :
-            'bg-blue-300 dark:bg-blue-800'
+            status === 'transcribing' ? 'bg-yellow-300 dark:bg-yellow-500' :
+            'bg-blue-300 dark:bg-lightblue-800'
           }`}>
             {status === 'idle' ? 'Ready' :
              status === 'recording' ? 'Recording...' :

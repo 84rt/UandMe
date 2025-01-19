@@ -41,5 +41,5 @@ The easiest way to deploy this application is to use the [Vercel Platform](https
 
 ## These are defnitely features _not_ bugs:
 - The system default color scheme overwrites the toggle setting for dark/light mode.
-- Most of the code (including the prompts) is is in `page.tsx`. The code is desigend not to be modular for readability, and definitely not becuase I'm lazy.
+- Most of the code (including the prompts) is is in `page.tsx`. The code is designed not to be modular for readability, and definitely not becuase I'm lazy.
 - There is no time limit on the recording, the system will keep recording until the user clicks "Stop Recording" (or the recording is stopped by the browser). **This is billing directly to my OpenAI account, please don't abuse this.**
