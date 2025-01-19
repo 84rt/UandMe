@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import OpenAI from 'openai';
-import { SYSTEM_PROMPT } from './constants';
 
 let openai: OpenAI | null = null;
 
