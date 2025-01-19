@@ -14,6 +14,7 @@ export default function Home() {
   const [error, setError] = useState<string>('');
   const [firstPersonName, setFirstPersonName] = useState('');
   const [secondPersonName, setSecondPersonName] = useState('');
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   // Refs to store MediaRecorder instances
   const firstRecorderRef = useRef<MediaRecorder | null>(null);
@@ -31,6 +32,14 @@ export default function Home() {
       apiKey: apiKey,
       dangerouslyAllowBrowser: true
     });
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const stopRecording = async (person: 'first' | 'second') => {
@@ -219,100 +228,111 @@ Remember to maintain neutrality throughout your summary, use empathetic language
   }, []);
 
   return (
-    <main className="min-h-screen p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 text-center dark:text-white">U&Me - Your AI Mediator</h1>
-      <h4 className="text-2xl font-semibold mb-4 dark:text-white">
-        Use AI to mediate a conversation and come to a mutual understanding.
-      </h4>
-      <p className="text-lg text-center text-gray-700 dark:text-gray-300">
-        Start by recording your side of the disagreement, and when you are done, pass the phone to the other person. 
-        Once both of you have recorded your responses, click 'Generate Mediation' to obtain an objective and unbiased overview of the disagreement.
-      </p>
-      <br></br>
+    <div className="min-h-screen relative">
+      <div 
+        className="parallax-bg"
+        style={{
+          backgroundImage: 'url("/bg.jpg")',
+          transform: `translateY(${scrollPosition * 0.5}px)`
+        }}
+      />
+      <div className="relative z-10">
+        <main className="min-h-screen p-8 max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-8 text-center dark:text-white">U&Me - Your AI Mediator</h1>
+          <h4 className="text-2xl font-semibold mb-4 dark:text-white">
+            Use AI to mediate a conversation and come to a mutual understanding.
+          </h4>
+          <p className="text-lg text-center text-gray-700 dark:text-gray-300">
+            Start by recording your side of the disagreement, and when you are done, pass the phone to the other person. 
+            Once both of you have recorded your responses, click 'Generate Mediation' to obtain an objective and unbiased overview of the disagreement.
+          </p>
+          <br></br>
 
-      {error && (
-        <div className="mb-8 p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg">
-          {error}
-        </div>
-      )}
+          {error && (
+            <div className="mb-8 p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg">
+              {error}
+            </div>
+          )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold dark:text-white">First Person</h2>
-          <input 
-            type="text" 
-            placeholder="Enter First Person's Name" 
-            value={firstPersonName} 
-            onChange={handleFirstNameChange} 
-            className="w-full p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-          />
-          <button
-            onClick={() => toggleRecording('first')}
-            className={`w-full p-3 rounded-lg ${
-              isRecordingFirst 
-                ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700' 
-                : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
-            } text-white transition-colors`}
-            disabled={isRecordingSecond}
-          >
-            {isRecordingFirst ? 'Stop Recording' : 'Start Recording'}
-          </button>
-          <textarea
-            value={firstPersonText}
-            onChange={(e) => setFirstPersonText(e.target.value)}
-            className="w-full h-40 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-            placeholder="First person's text will appear here..."
-          />
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold dark:text-white">First Person</h2>
+              <input 
+                type="text" 
+                placeholder="Enter First Person's Name" 
+                value={firstPersonName} 
+                onChange={handleFirstNameChange} 
+                className="w-full p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+              />
+              <button
+                onClick={() => toggleRecording('first')}
+                className={`w-full p-3 rounded-lg ${
+                  isRecordingFirst 
+                    ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700' 
+                    : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+                } text-white transition-colors`}
+                disabled={isRecordingSecond}
+              >
+                {isRecordingFirst ? 'Stop Recording' : 'Start Recording'}
+              </button>
+              <textarea
+                value={firstPersonText}
+                onChange={(e) => setFirstPersonText(e.target.value)}
+                className="w-full h-40 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                placeholder="First person's text will appear here..."
+              />
+            </div>
 
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold dark:text-white">Second Person</h2>
-          <input 
-            type="text" 
-            placeholder="Enter Second Person's Name" 
-            value={secondPersonName} 
-            onChange={handleSecondNameChange} 
-            className="w-full p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-          />
-          <button
-            onClick={() => toggleRecording('second')}
-            className={`w-full p-3 rounded-lg ${
-              isRecordingSecond 
-                ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700' 
-                : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
-            } text-white transition-colors`}
-            disabled={isRecordingFirst}
-          >
-            {isRecordingSecond ? 'Stop Recording' : 'Start Recording'}
-          </button>
-          <textarea
-            value={secondPersonText}
-            onChange={(e) => setSecondPersonText(e.target.value)}
-            className="w-full h-40 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
-            placeholder="Second person's text will appear here..."
-          />
-        </div>
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold dark:text-white">Second Person</h2>
+              <input 
+                type="text" 
+                placeholder="Enter Second Person's Name" 
+                value={secondPersonName} 
+                onChange={handleSecondNameChange} 
+                className="w-full p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+              />
+              <button
+                onClick={() => toggleRecording('second')}
+                className={`w-full p-3 rounded-lg ${
+                  isRecordingSecond 
+                    ? 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700' 
+                    : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+                } text-white transition-colors`}
+                disabled={isRecordingFirst}
+              >
+                {isRecordingSecond ? 'Stop Recording' : 'Start Recording'}
+              </button>
+              <textarea
+                value={secondPersonText}
+                onChange={(e) => setSecondPersonText(e.target.value)}
+                className="w-full h-40 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+                placeholder="Second person's text will appear here..."
+              />
+            </div>
+          </div>
+
+          <div className="text-center mb-8">
+            {/* TODO: make this button change text when the response is loading */}
+            {/* The bolded headings display ** as opposed to boalded text */}
+            <button
+              onClick={sendToChatGPT}
+              className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!firstPersonText || !secondPersonText}
+            >
+              Generate Mediation
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold dark:text-white">AI Mediation Analysis</h2>
+            <div
+              className="w-full p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg whitespace-pre-wrap"
+              dangerouslySetInnerHTML={{ __html: chatGPTResponse }}
+            />
+          </div>
+        </main>
       </div>
-
-      <div className="text-center mb-8">
-        {/* TODO: make this button change text when the response is loading */}
-        {/* The bolded headings display ** as opposed to boalded text */}
-        <button
-          onClick={sendToChatGPT}
-          className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={!firstPersonText || !secondPersonText}
-        >
-          Generate Mediation
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold dark:text-white">AI Mediation Analysis</h2>
-        <div
-          className="w-full p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg whitespace-pre-wrap"
-          dangerouslySetInnerHTML={{ __html: chatGPTResponse }}
-        />
-      </div>
-    </main>
+    </div>
   );
 }
