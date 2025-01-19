@@ -5,19 +5,21 @@ import { useState } from 'react';
 interface SideMenuProps {
   darkMode: boolean;
   gregMode: boolean;
+  founderMode: boolean;
   onDarkModeToggle: () => void;
   onGregModeToggle: () => void;
+  onFounderModeToggle: () => void;
 }
 
-export function SideMenu({ darkMode, gregMode, onDarkModeToggle, onGregModeToggle }: SideMenuProps) {
+export function SideMenu({ darkMode, gregMode, founderMode, onDarkModeToggle, onGregModeToggle, onFounderModeToggle }: SideMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ${isOpen ? 'w-64' : 'w-12'}`}>
-      {/* Menu Button */}
+    <div className="fixed left-0 top-0 h-full z-50">
+      {/* Menu Button - Now outside the sliding panel */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="absolute top-4 left-4 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+        className={`fixed top-4 left-4 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors z-50`}
         aria-label="Toggle menu"
       >
         <svg
@@ -36,7 +38,7 @@ export function SideMenu({ darkMode, gregMode, onDarkModeToggle, onGregModeToggl
 
       {/* Menu Content */}
       <div
-        className={`absolute left-0 top-0 h-full bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 ${
+        className={`fixed left-0 top-0 h-full bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 ${
           isOpen ? 'w-64 opacity-100' : 'w-0 opacity-0 pointer-events-none'
         }`}
       >
@@ -62,9 +64,26 @@ export function SideMenu({ darkMode, gregMode, onDarkModeToggle, onGregModeToggl
               </button>
             </div>
 
+            {/* Founder Mode Toggle */}
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700 dark:text-gray-200">Founder Mode</span>
+              <button
+                onClick={onFounderModeToggle}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  founderMode ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    founderMode ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            
             {/* Greg Mode Toggle */}
             <div className="flex items-center justify-between">
-              <span className="text-gray-700 dark:text-gray-200">Greg Mode</span>
+              <span className="text-gray-700 dark:text-gray-200">Gert Mode</span>
               <button
                 onClick={onGregModeToggle}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -78,6 +97,7 @@ export function SideMenu({ darkMode, gregMode, onDarkModeToggle, onGregModeToggl
                 />
               </button>
             </div>
+
           </div>
         </div>
       </div>

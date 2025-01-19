@@ -16,6 +16,9 @@ export default function Home() {
   const [secondPersonName, setSecondPersonName] = useState('');
   const [scrollPosition, setScrollPosition] = useState(0);
   const [status, setStatus] = useState<'idle' | 'recording' | 'transcribing' | 'generating'>('idle');
+  const [darkMode, setDarkMode] = useState(false);
+  const [gregMode, setGregMode] = useState(false);
+  const [founderMode, setFounderMode] = useState(false);
 
   // Refs to store MediaRecorder instances
   const firstRecorderRef = useRef<MediaRecorder | null>(null);
@@ -49,6 +52,33 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    const savedGregMode = localStorage.getItem('gregM') === 'true';
+    const savedFounderMode = localStorage.getItem('founderMode') === 'true';
+    setDarkMode(savedDarkMode);
+    setGregMode(savedGregMode);
+    setFounderMode(savedFounderMode);
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    localStorage.setItem('darkMode', String(newDarkMode));
+  };
+
+  const toggleGregMode = () => {
+    const newGregMode = !gregMode;
+    setGregMode(newGregMode);
+    localStorage.setItem('gregM', String(newGregMode));
+  };
+
+  const toggleFounderMode = () => {
+    const newFounderMode = !founderMode;
+    setFounderMode(newFounderMode);
+    localStorage.setItem('founderMode', String(newFounderMode));
+  };
 
   const stopRecording = async (person: 'first' | 'second') => {
     const recorder = person === 'first' ? firstRecorderRef.current : secondRecorderRef.current;
@@ -168,9 +198,24 @@ export default function Home() {
         messages: [
           {
             role: 'system',
-            content: localStorage.getItem('gregMode') === 'true' 
-              ? `You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}. Explain in detail why Gert is right and argue his side.`
-              : `
+            content: localStorage.getItem('founderMode') === 'true'
+              ? `Respond with nothing but "You are in founder mode now, stop fucking around and get back to work".`
+              : localStorage.getItem('gregM') === 'true' 
+                ? `
+You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}. 
+
+Gert has a stronger argument, explain why while considering the other person's argument.
+  
+Present your summary in the following format:
+
+  <b> 1. Summary of ${firstPersonName}'s argument, concerns, and goals </b>
+
+  <b> 2. Summary of ${secondPersonName}'s argument, concerns, and goals</b>
+
+  <b> 3. Explanation of why Gert has a stronger argument</b>
+
+  <b> 4. Suggestions for steps forward considering Gert's superiority</b>`
+                : `
 You are tasked with creating a short and coherent breakdown of two sides of an argument. Your goal is to present both perspectives fairly and neutrally while highlighting potential areas for resolution. Follow these steps carefully:
 
 1. You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}.
@@ -247,7 +292,7 @@ Remember to maintain neutrality throughout your summary, use empathetic language
       <div 
         className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out -z-10"
         style={{
-          backgroundImage: 'url(/public/gb.jpg)',
+          backgroundImage: '/public/bg.jpg',
           opacity: bgOpacity
         }}
       />

@@ -10,6 +10,7 @@ export function DarkModeProvider({
 }) {
   const [darkMode, setDarkMode] = useState(false);
   const [gregMode, setGregMode] = useState(false);
+  const [founderMode, setFounderMode] = useState(false);
 
   useEffect(() => {
     // Check if user has dark mode preference
@@ -39,14 +40,20 @@ export function DarkModeProvider({
     localStorage.setItem('gregMode', gregMode.toString());
   }, [gregMode]);
 
+  useEffect(() => {
+    localStorage.setItem('founderMode', founderMode.toString());
+  }, [founderMode]);
+
   return (
     <div className={`${darkMode ? 'dark' : ''}`}>
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
         <SideMenu
           darkMode={darkMode}
           gregMode={gregMode}
+          founderMode={founderMode}
           onDarkModeToggle={() => setDarkMode(!darkMode)}
           onGregModeToggle={() => setGregMode(!gregMode)}
+          onFounderModeToggle={() => setFounderMode(!founderMode)}
         />
         {children}
       </div>
