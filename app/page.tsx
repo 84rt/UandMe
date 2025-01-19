@@ -310,6 +310,21 @@ Present your summary in the following format:
         }}
       />
       <div className="relative z-10">
+        {/* Status indicator moved to top left */}
+        <div className="fixed top-4 left-4 z-50">
+          <span className="text-sm text-gray-500 dark:text-gray-400">Status: </span>
+          <span className={`inline-block px-3 py-1 rounded-full text-sm ${
+            status === 'idle' ? 'bg-gray-300 dark:bg-gray-500' :
+            status === 'recording' ? 'bg-red-300 dark:bg-red-800 animate-pulse' :
+            status === 'transcribing' ? 'bg-yellow-300 dark:bg-yellow-800' :
+            'bg-blue-300 dark:bg-blue-800'
+          }`}>
+            {status === 'idle' ? 'Ready' :
+             status === 'recording' ? 'Recording...' :
+             status === 'transcribing' ? 'Transcribing...' :
+             'Generating Response...'}
+          </span>
+        </div>
         <main className="min-h-screen p-8 max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-8 text-center dark:text-white">U&Me - Your AI Mediator</h1>
           <h4 className="text-2xl font-semibold mb-4 dark:text-white">
@@ -327,20 +342,7 @@ Present your summary in the following format:
             </div>
           )}
           <div className="text-center mb-8">
-            <div className="mb-4">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Status: </span>
-              <span className={`inline-block px-3 py-1 rounded-full text-sm ${
-                status === 'idle' ? 'bg-gray-300 dark:bg-gray-500' :
-                status === 'recording' ? 'bg-red-300 dark:bg-red-800 animate-pulse' :
-                status === 'transcribing' ? 'bg-yellow-300 dark:bg-yellow-800' :
-                'bg-blue-300 dark:bg-blue-800'
-              }`}>
-                {status === 'idle' ? 'Ready' :
-                 status === 'recording' ? 'Recording...' :
-                 status === 'transcribing' ? 'Transcribing...' :
-                 'Generating Response...'}
-              </span>
-            </div>
+            {/* Removed the old status indicator from here */}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="space-y-4">
@@ -427,10 +429,12 @@ Present your summary in the following format:
             >
             </div>
           </div>
+          <br></br>
+          <p className="text-sm text-center text-gray-500 dark:text-gray-400">
+            Created by 84rt in 2025 under MIT License | Repo can be found here: <a href="https://github.com/84rt/UandMe" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">GitHub</a>
+          </p>
         </main>
       </div>
     </div>
   );
 }
-
-

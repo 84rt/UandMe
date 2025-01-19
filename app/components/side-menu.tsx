@@ -15,11 +15,11 @@ export function SideMenu({ darkMode, gregMode, founderMode, onDarkModeToggle, on
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="fixed left-0 top-0 h-full z-50">
+    <div className="fixed right-0 top-0 h-full z-50">
       {/* Menu Button - Now outside the sliding panel */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed top-4 left-4 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors z-50`}
+        className={`fixed top-4 right-4 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors z-50`}
         aria-label="Toggle menu"
       >
         <svg
@@ -38,7 +38,7 @@ export function SideMenu({ darkMode, gregMode, founderMode, onDarkModeToggle, on
 
       {/* Menu Content */}
       <div
-        className={`fixed left-0 top-0 h-full bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 ${
+        className={`fixed right-0 top-0 h-full bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 ${
           isOpen ? 'w-64 opacity-100' : 'w-0 opacity-0 pointer-events-none'
         }`}
       >
