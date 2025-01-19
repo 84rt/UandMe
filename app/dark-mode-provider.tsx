@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { SideMenu } from './components/side-menu';
 
 export function DarkModeProvider({
   children,
@@ -8,6 +9,7 @@ export function DarkModeProvider({
   children: React.ReactNode;
 }) {
   const [darkMode, setDarkMode] = useState(false);
+  const [gregMode, setGregMode] = useState(false);
 
   useEffect(() => {
     // Check if user has dark mode preference
@@ -16,6 +18,10 @@ export function DarkModeProvider({
         (!('darkMode' in localStorage) && 
           window.matchMedia('(prefers-color-scheme: dark)').matches);
       setDarkMode(isDark);
+      
+      // Check if user has Greg mode preference
+      const isGreg = localStorage.getItem('gregMode') === 'true';
+      setGregMode(isGreg);
     }
   }, []);
 
@@ -29,26 +35,19 @@ export function DarkModeProvider({
     }
   }, [darkMode]);
 
+  useEffect(() => {
+    localStorage.setItem('gregMode', gregMode.toString());
+  }, [gregMode]);
+
   return (
     <div className={`${darkMode ? 'dark' : ''}`}>
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
-        <div className="fixed top-4 right-4 z-50">
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-            aria-label="Toggle dark mode"
-          >
-            {darkMode ? (
-              <svg className="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            )}
-          </button>
-        </div>
+        <SideMenu
+          darkMode={darkMode}
+          gregMode={gregMode}
+          onDarkModeToggle={() => setDarkMode(!darkMode)}
+          onGregModeToggle={() => setGregMode(!gregMode)}
+        />
         {children}
       </div>
     </div>

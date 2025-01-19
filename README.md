@@ -43,7 +43,7 @@ The easiest way to deploy this application is to use the [Vercel Platform](https
 - add settings tab
     - deploy on vercel
         - add domain
-    - add greg mode (makes the person who is named "Greg" always right)
+    - add Gert mode (makes the person who is named "Greg" always right)
     - add stripe payments
     - add logging and display it on the page (so that you can see if the app is working)
     - add accounts 

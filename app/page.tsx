@@ -168,7 +168,9 @@ export default function Home() {
         messages: [
           {
             role: 'system',
-            content: `
+            content: localStorage.getItem('gregMode') === 'true' 
+              ? `You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}. Explain in detail why Gert is right and argue his side.`
+              : `
 You are tasked with creating a short and coherent breakdown of two sides of an argument. Your goal is to present both perspectives fairly and neutrally while highlighting potential areas for resolution. Follow these steps carefully:
 
 1. You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}.
@@ -202,7 +204,6 @@ You are tasked with creating a short and coherent breakdown of two sides of an a
 
 
 Remember to maintain neutrality throughout your summary, use empathetic language, and focus on problem-solving rather than assigning blame or judgment. Your goal is to provide a clear, unbiased overview of the situation that could potentially help both sides move towards a resolution.`
-
           },
           {
             role: 'user',
