@@ -296,6 +296,7 @@ Remember to maintain neutrality throughout your summary, use empathetic language
 
       <div className="text-center mb-8">
         {/* TODO: make this button change text when the response is loading */}
+        {/* The bolded headings display ** as opposed to boalded text */}
         <button
           onClick={sendToChatGPT}
           className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
