@@ -199,13 +199,25 @@ export default function Home() {
           {
             role: 'system',
             content: localStorage.getItem('founderMode') === 'true'
-              ? `Respond with nothing but "You are in founder mode now, stop fucking around and get back to work".`
-              : localStorage.getItem('gregM') === 'true' 
-                ? `
-You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}. 
+              ? `Highlight the areas of disagreement between ${firstPersonName} and ${secondPersonName} with the emphasis on the factual pieces of information that if changed could lead to a resolution (refer to these as "Cruxes").
 
-Gert has a stronger argument, explain why while considering the other person's argument.
-  
+Highlight the top Cruxes and the areas where both sides could work together to find a solution.
+
+Present your summary in the following format:
+
+  <b> 1. Summary of ${firstPersonName}'s argument, concerns, and goals </b>
+  <b> 2. Summary of ${secondPersonName}'s argument, concerns, and goals</b>
+
+  <b> 3. Top Cruxes</b>
+
+  <b> 4. Areas where both sides could work together to find a solution</b>
+
+MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDOWN`
+              : localStorage.getItem('gregMode') === 'true'
+                ? `You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}. 
+
+If one of the sides is called Gert, argue their side and explain why their argument is superior.
+
 Present your summary in the following format:
 
   <b> 1. Summary of ${firstPersonName}'s argument, concerns, and goals </b>
@@ -214,9 +226,9 @@ Present your summary in the following format:
 
   <b> 3. Explanation of why Gert has a stronger argument</b>
 
-  <b> 4. Suggestions for steps forward considering Gert's superiority</b>`
-                : `
-You are tasked with creating a short and coherent breakdown of two sides of an argument. Your goal is to present both perspectives fairly and neutrally while highlighting potential areas for resolution. Follow these steps carefully:
+  <b> 4. Suggestions for steps forward considering Gert's superiority</b>
+  MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDOWN`
+                : `You are tasked with creating a short and coherent breakdown of two sides of an argument. Your goal is to present both perspectives fairly and neutrally while highlighting potential areas for resolution. Follow these steps carefully:
 
 1. You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}.
 
@@ -248,7 +260,9 @@ You are tasked with creating a short and coherent breakdown of two sides of an a
    <b> 4. Suggestions for steps forward or areas of possible compromise</b>
 
 
-Remember to maintain neutrality throughout your summary, use empathetic language, and focus on problem-solving rather than assigning blame or judgment. Your goal is to provide a clear, unbiased overview of the situation that could potentially help both sides move towards a resolution.`
+Remember to maintain neutrality throughout your summary, use empathetic language, and focus on problem-solving rather than assigning blame or judgment. Your goal is to provide a clear, unbiased overview of the situation that could potentially help both sides move towards a resolution.
+
+MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDOWN`
           },
           {
             role: 'user',

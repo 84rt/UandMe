@@ -81,7 +81,7 @@ export function SideMenu({ darkMode, gregMode, founderMode, onDarkModeToggle, on
               </button>
             </div>
             
-            {/* Greg Mode Toggle */}
+            {/* Gert Mode Toggle */}
             <div className="flex items-center justify-between">
               <span className="text-gray-700 dark:text-gray-200">Gert Mode</span>
               <button
