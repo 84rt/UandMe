@@ -37,4 +37,14 @@ The easiest way to deploy this application is to use the [Vercel Platform](https
 2. Import your project to Vercel
 3. Add your OpenAI API key to the environment variables in your Vercel project settings
 4. Deploy!
-# UandMe
+
+
+## Todo:
+- add settings tab
+    - fix dark mode toggle not working
+    - add greg mode (makes the person who is named "Greg" always right)
+    - add stripe payments
+    - ad logging and display it on the page (so that you can see if the app is working)
+    - add accounts 
+        - log in with google 
+        - log in with github

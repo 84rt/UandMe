@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import OpenAI from 'openai';
+import { SYSTEM_PROMPT } from './constants';
 
 let openai: OpenAI | null = null;
 
@@ -12,6 +13,8 @@ export default function Home() {
   const [isRecordingFirst, setIsRecordingFirst] = useState(false);
   const [isRecordingSecond, setIsRecordingSecond] = useState(false);
   const [error, setError] = useState<string>('');
+  const [firstPersonName, setFirstPersonName] = useState('');
+  const [secondPersonName, setSecondPersonName] = useState('');
 
   // Refs to store MediaRecorder instances
   const firstRecorderRef = useRef<MediaRecorder | null>(null);
@@ -141,15 +144,15 @@ export default function Home() {
 
     try {
       const response = await openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant analyzing a conversation between two people.'
+            content: SYSTEM_PROMPT
           },
           {
             role: 'user',
-            content: `First person: ${firstPersonText}\nSecond person: ${secondPersonText}`
+            content: `${firstPersonName}: ${firstPersonText}\n${secondPersonName}: ${secondPersonText}`
           }
         ],
       });
@@ -160,6 +163,14 @@ export default function Home() {
       console.error('Error sending to ChatGPT:', error);
       setError(`Error getting response from ChatGPT: ${error.message || 'Please check your API key and try again.'}`);
     }
+  };
+
+  const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFirstPersonName(event.target.value);
+  };
+
+  const handleSecondNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSecondPersonName(event.target.value);
   };
 
   // Cleanup function
@@ -176,10 +187,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 text-center dark:text-white">U&Me - AI Mediator</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center dark:text-white">U&Me - Your AI Mediator</h1>
+      <h4 className="text-2xl font-semibold mb-4 dark:text-white">
+        Use AI to mediate a conversation and come to a mutual understanding.
+      </h4>
       <p className="text-lg text-center text-gray-700 dark:text-gray-300">
-        A tool for two people to communicate and come to a mutual understanding.
-        Record a conversation and get a generated response based on the conversation.
+        Start by recording your side of the disagreement, and when you are done, pass the phone to the other person. 
+        Once both of you have recorded your responses, click 'Generate Mediation' to obtain an objective and unbiased overview of the disagreement.
       </p>
       <br></br>
 
@@ -192,6 +206,13 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="space-y-4">
           <h2 className="text-xl font-semibold dark:text-white">First Person</h2>
+          <input 
+            type="text" 
+            placeholder="Enter First Person's Name" 
+            value={firstPersonName} 
+            onChange={handleFirstNameChange} 
+            className="w-full p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+          />
           <button
             onClick={() => toggleRecording('first')}
             className={`w-full p-3 rounded-lg ${
@@ -213,6 +234,13 @@ export default function Home() {
 
         <div className="space-y-4">
           <h2 className="text-xl font-semibold dark:text-white">Second Person</h2>
+          <input 
+            type="text" 
+            placeholder="Enter Second Person's Name" 
+            value={secondPersonName} 
+            onChange={handleSecondNameChange} 
+            className="w-full p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent"
+          />
           <button
             onClick={() => toggleRecording('second')}
             className={`w-full p-3 rounded-lg ${
@@ -234,22 +262,21 @@ export default function Home() {
       </div>
 
       <div className="text-center mb-8">
+        {/* TODO: make this button change text when the response is loading */}
         <button
           onClick={sendToChatGPT}
           className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!firstPersonText || !secondPersonText}
         >
-          Analyze Conversation
+          Generate Mediation
         </button>
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold dark:text-white">ChatGPT Analysis</h2>
-        <textarea
-          value={chatGPTResponse}
-          readOnly
-          className="w-full h-48 p-3 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-          placeholder="ChatGPT's analysis will appear here..."
+        <h2 className="text-2xl font-semibold dark:text-white">AI Mediation Analysis</h2>
+        <div
+          className="w-full p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg whitespace-pre-wrap"
+          dangerouslySetInnerHTML={{ __html: chatGPTResponse }}
         />
       </div>
     </main>
