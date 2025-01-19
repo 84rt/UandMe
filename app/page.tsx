@@ -15,12 +15,16 @@ export default function Home() {
   const [firstPersonName, setFirstPersonName] = useState('');
   const [secondPersonName, setSecondPersonName] = useState('');
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [status, setStatus] = useState<'idle' | 'recording' | 'transcribing' | 'generating'>('idle');
 
   // Refs to store MediaRecorder instances
   const firstRecorderRef = useRef<MediaRecorder | null>(null);
   const secondRecorderRef = useRef<MediaRecorder | null>(null);
   const firstStreamRef = useRef<MediaStream | null>(null);
   const secondStreamRef = useRef<MediaStream | null>(null);
+
+  // Add background animation effect
+  const [bgOpacity, setBgOpacity] = useState(0);
 
   useEffect(() => {
     const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
@@ -32,6 +36,10 @@ export default function Home() {
       apiKey: apiKey,
       dangerouslyAllowBrowser: true
     });
+  }, []);
+
+  useEffect(() => {
+    setBgOpacity(1);
   }, []);
 
   useEffect(() => {
@@ -71,11 +79,13 @@ export default function Home() {
 
     // If already recording, stop it
     if ((person === 'first' && isRecordingFirst) || (person === 'second' && isRecordingSecond)) {
+      setStatus('transcribing');
       await stopRecording(person);
       return;
     }
 
     try {
+      setStatus('recording');
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       const audioChunks: Blob[] = [];
@@ -113,6 +123,7 @@ export default function Home() {
             setSecondPersonText(prev => prev + (prev ? '\n' : '') + response.text);
           }
           setError('');
+          setStatus('idle');
         } catch (error: any) {
           console.error('Error transcribing audio:', error);
           setError(`Error transcribing audio: ${error.message || 'Unknown error occurred'}`);
@@ -151,6 +162,7 @@ export default function Home() {
     }
 
     try {
+      setStatus('generating');
       const response = await openai.chat.completions.create({
         model: 'gpt-4o',
         messages: [
@@ -201,6 +213,7 @@ Remember to maintain neutrality throughout your summary, use empathetic language
 
       setChatGPTResponse(response.choices[0].message.content || '');
       setError('');
+      setStatus('idle');
     } catch (error: any) {
       console.error('Error sending to ChatGPT:', error);
       setError(`Error getting response from ChatGPT: ${error.message || 'Please check your API key and try again.'}`);
@@ -229,11 +242,12 @@ Remember to maintain neutrality throughout your summary, use empathetic language
 
   return (
     <div className="min-h-screen relative">
+      {/* Animated background */}
       <div 
-        className="parallax-bg"
+        className="fixed inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out -z-10"
         style={{
-          backgroundImage: 'url("/bg.jpg")',
-          transform: `translateY(${scrollPosition * 0.5}px)`
+          backgroundImage: 'url(/public/gb.jpg)',
+          opacity: bgOpacity
         }}
       />
       <div className="relative z-10">
@@ -253,7 +267,22 @@ Remember to maintain neutrality throughout your summary, use empathetic language
               {error}
             </div>
           )}
-
+          <div className="text-center mb-8">
+            <div className="mb-4">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Status: </span>
+              <span className={`inline-block px-3 py-1 rounded-full text-sm ${
+                status === 'idle' ? 'bg-gray-300 dark:bg-gray-500' :
+                status === 'recording' ? 'bg-red-300 dark:bg-red-800 animate-pulse' :
+                status === 'transcribing' ? 'bg-yellow-300 dark:bg-yellow-800' :
+                'bg-blue-300 dark:bg-blue-800'
+              }`}>
+                {status === 'idle' ? 'Ready' :
+                 status === 'recording' ? 'Recording...' :
+                 status === 'transcribing' ? 'Transcribing...' :
+                 'Generating Response...'}
+              </span>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold dark:text-white">First Person</h2>
@@ -313,12 +342,10 @@ Remember to maintain neutrality throughout your summary, use empathetic language
           </div>
 
           <div className="text-center mb-8">
-            {/* TODO: make this button change text when the response is loading */}
-            {/* The bolded headings display ** as opposed to boalded text */}
             <button
               onClick={sendToChatGPT}
               className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={!firstPersonText || !secondPersonText}
+              disabled={!firstPersonText || !secondPersonText || status === 'generating'}
             >
               Generate Mediation
             </button>
