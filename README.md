@@ -1,14 +1,14 @@
-# Voice to AI Assistant
+# The U&Me AI Mediator
 
-This is a Next.js application that allows users to record their voice, converts it to text using OpenAI's Whisper API, and then processes the text using GPT-3.5 to generate responses.
+This is a Next.js application that allows users to record their voice, converts it to text using OpenAI's Whisper API, and then processes the text using GPT-4o to generate responses.
 
-## Features
+## ✨ Features
 
-- Voice recording using the browser's media API
-- Speech-to-text conversion using OpenAI's Whisper API
-- Text processing using GPT-3.5
-- Real-time status updates
-- Modern UI with Tailwind CSS
+- 🎙️ Voice recording using the browser's media API
+- 🗣️ Speech-to-text conversion using OpenAI's Whisper API
+- 🤖 Text processing using GPT-4o
+- ⏱️ Real-time status updates
+- 💻 Modern UI with Tailwind CSS
 
 ## Setup
 
@@ -29,7 +29,7 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Deploy on Vercel
+## 🚀 Deploy on Vercel
 
 The easiest way to deploy this application is to use the [Vercel Platform](https://vercel.com/new).
 
@@ -39,16 +39,7 @@ The easiest way to deploy this application is to use the [Vercel Platform](https
 4. Deploy!
 
 
-## Todo:
-- add settings tab
-    - deploy on vercel
-        - add domain
-    - add Gert mode (makes the person who is named "Greg" always right)
-    - add stripe payments
-    - add logging and display it on the page (so that you can see if the app is working)
-    - add accounts 
-
-## Bucket for `Feature Creap`:
-    - fix dark mode toggle not working
-        - log in with google 
-        - log in with github
+## These are defnitely features _not_ bugs:
+- The system default color scheme overwrites the toggle setting for dark/light mode.
+- Most of the code (including the prompts) is is in `page.tsx`. The code is desigend not to be modular for readability, and definitely not becuase I'm lazy.
+- There is no time limit on the recording, the system will keep recording until the user clicks "Stop Recording" (or the recording is stopped by the browser). **This is billing directly to my OpenAI account, please don't abuse this.**

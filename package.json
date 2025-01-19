@@ -16,7 +16,10 @@
     "openai": "^4.79.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-media-recorder": "^1.7.1"
+    "react-markdown": "^9.0.3",
+    "react-media-recorder": "^1.7.1",
+    "remark-gfm": "^4.0.0",
+    "remark-html": "^16.0.1"
   },
   "devDependencies": {
     "@types/react": "19.0.7",

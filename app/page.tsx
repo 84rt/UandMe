@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import OpenAI from 'openai';
+import ReactMarkdown from 'react-markdown';
+import gfm from 'remark-gfm';
 
 let openai: OpenAI | null = null;
 
@@ -205,14 +207,15 @@ Highlight the top Cruxes and the areas where both sides could work together to f
 
 Present your summary in the following format:
 
-  <b> 1. Summary of ${firstPersonName}'s argument, concerns, and goals </b>
-  <b> 2. Summary of ${secondPersonName}'s argument, concerns, and goals</b>
+  1. Summary of ${firstPersonName}'s argument, concerns, and goals
 
-  <b> 3. Top Cruxes</b>
+  2. Summary of ${secondPersonName}'s argument, concerns, and goals
 
-  <b> 4. Areas where both sides could work together to find a solution</b>
+  3. Top Cruxes
 
-MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE. DO NOT USE MARKDOWN`
+  4. Areas where both sides could work together to find a solution
+`
+
               : localStorage.getItem('gregMode') === 'true'
                 ? `You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}. 
 
@@ -220,14 +223,14 @@ If one of the sides is called Gert, argue their side and explain why their argum
 
 Present your summary in the following format:
 
-  <b> 1. Summary of ${firstPersonName}'s argument, concerns, and goals </b>
+  1. Summary of ${firstPersonName}'s argument, concerns, and goals
 
-  <b> 2. Summary of ${secondPersonName}'s argument, concerns, and goals</b>
+  2. Summary of ${secondPersonName}'s argument, concerns, and goals
 
-  <b> 3. Explanation of why Gert has a stronger argument</b>
+  3. Explanation of why Gert has a stronger argument
 
-  <b> 4. Suggestions for steps forward considering Gert's superiority</b>
-  MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDOWN`
+  4. Suggestions for steps forward considering Gert's superiority
+  `
                 : `You are tasked with creating a short and coherent breakdown of two sides of an argument. Your goal is to present both perspectives fairly and neutrally while highlighting potential areas for resolution. Follow these steps carefully:
 
 1. You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}.
@@ -251,18 +254,14 @@ Present your summary in the following format:
 
 7. Present your summary in the following format:
    
-   <b> 1. Summary of ${firstPersonName}'s argument, concerns, and goals </b>
-  
-   <b> 2. Summary of ${secondPersonName}'s argument, concerns, and goals</b>
+   1. Summary of ${firstPersonName}'s argument, concerns, and goals
 
-   <b> 3. Any shared goals or areas of agreement identified</b>
+   2. Summary of ${secondPersonName}'s argument, concerns, and goals
 
-   <b> 4. Suggestions for steps forward or areas of possible compromise</b>
+   3. Any shared goals or areas of agreement identified
 
-
-Remember to maintain neutrality throughout your summary, use empathetic language, and focus on problem-solving rather than assigning blame or judgment. Your goal is to provide a clear, unbiased overview of the situation that could potentially help both sides move towards a resolution.
-
-MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDOWN`
+   4. Suggestions for steps forward or areas of possible compromise
+   `
           },
           {
             role: 'user',
@@ -413,13 +412,25 @@ MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDO
 
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold dark:text-white">AI Mediation Analysis</h2>
+            {/* <ReactMarkdown
+              remarkPlugins={[gfm]}
+              className="w-full p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg overflow-auto"
+              components={{
+                p: ({ node, ...props }) => <p {...props} className="mb-4" />,
+              }}
+            >
+              {chatGPTResponse}
+            </ReactMarkdown> */}
             <div
-              className="w-full p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg whitespace-pre-wrap"
+              className="w-full p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg overflow-auto whitespace-pre-line"
               dangerouslySetInnerHTML={{ __html: chatGPTResponse }}
-            />
+            >
+            </div>
           </div>
         </main>
       </div>
     </div>
   );
 }
+
+
