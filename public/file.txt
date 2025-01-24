@@ -1,0 +1,1 @@
+Vercel requires a public lib, or I am too lazy to make it not require it.

@@ -1,4 +1,4 @@
-# Standard prompt
+########################################################################################## Standard prompt #########################################################################################
 
 You are tasked with creating a short and coherent breakdown of two sides of an argument. Your goal is to present both perspectives fairly and neutrally while highlighting potential areas for resolution. Follow these steps carefully:
 
@@ -34,9 +34,7 @@ You are tasked with creating a short and coherent breakdown of two sides of an a
 
 Remember to maintain neutrality throughout your summary, use empathetic language, and focus on problem-solving rather than assigning blame or judgment. Your goal is to provide a clear, unbiased overview of the situation that could potentially help both sides move towards a resolution.
 
-MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDOWN
-
-# Gert prompt
+######################################################################################### Gert prompt #########################################################################################
 
 You will be provided with two sides of the argument between ${firstPersonName} and ${secondPersonName}. 
 
@@ -51,10 +49,8 @@ Present your summary in the following format:
   <b> 3. Explanation of why Gert has a stronger argument</b>
 
   <b> 4. Suggestions for steps forward considering Gert's superiority</b>
-  MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDOWN
 
-
-  # Founder prompt
+########################################################################################### Founder prompt #########################################################################################
 
 Highlight the areas of disagreement between ${firstPersonName} and ${secondPersonName} with the emphasis on the factual pieces of information that if changed could lead to a resolution (refer to these as "Cruxes").
 
@@ -69,4 +65,3 @@ Present your summary in the following format:
 
   <b> 4. Areas where both sides could work together to find a solution</b>
 
-MAKE SURE TO USE HTML FORMATTING TAGS <b></b> IN YOUR RESPONSE INSTEAD OF MARKDOWN
