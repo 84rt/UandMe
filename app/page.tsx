@@ -407,7 +407,7 @@ Present your summary in the following format:
 
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold dark:text-white">AI Mediation Analysis</h2>
-            {/* <ReactMarkdown
+            <ReactMarkdown
               remarkPlugins={[gfm]}
               className="w-full p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg overflow-auto"
               components={{
@@ -415,12 +415,12 @@ Present your summary in the following format:
               }}
             >
               {chatGPTResponse}
-            </ReactMarkdown> */}
-            <div
+            </ReactMarkdown>
+            {/* <div
               className="w-full p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg overflow-auto whitespace-pre-line"
               dangerouslySetInnerHTML={{ __html: chatGPTResponse }}
             >
-            </div>
+            </div> */}
           </div>
           <br></br>
           <p className="text-sm text-center text-gray-500 dark:text-gray-400">
